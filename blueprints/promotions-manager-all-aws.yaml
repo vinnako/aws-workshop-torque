@@ -3,27 +3,22 @@ kind: blueprint
 metadata:
   description: >
     All in one deployment of our promotions manager
-    
-clouds: 
+clouds:
   - AWS: eu-west-1
-  
 artifacts:
   - promotions-manager-ui: artifacts/latest/promotions-manager-ui.master.tar.gz
   - promotions-manager-api: artifacts/latest/promotions-manager-api.master.tar.gz
- 
-
 inputs:
 - PORT: 3000
 - API_PORT: 3001
-- AWS_INSTANCE_TYPE: t3.large
+- AWS_INSTANCE_TYPE: m5.large
 - RELEASE_NUMBER: none
 - API_BUILD_NUMBER: none
 - DB_USERNAME: adminuser
-- DB_PASSWORD: 
+- DB_PASSWORD:
     display_style: masked
     description: please set the master database password
     default_value: Welcome1234567+
-
 applications:
   - promotions-manager-ui:
       #target: vm1
@@ -34,9 +29,8 @@ applications:
         - API_PORT: $API_PORT
       #depends_on:
       #  - promotions-manager-api
-    
-- promotions-manager-api:      
-      depends_on: 
+  - promotions-manager-api:
+      depends_on:
         - promotions-manager-docdb
       input_values:
         - API_PORT: $API_PORT
@@ -44,13 +38,11 @@ applications:
         - DATABASE_HOST: $outputs.promotions-manager-docdb.connection_string
         - RELEASE_NUMBER: $RELEASE_NUMBER
         - API_BUILD_NUMBER: $API_BUILD_NUMBER
-  
 services:
   - promotions-manager-docdb:
       input_values:
         - USERNAME: $DB_USERNAME
         - PASSWORD: $DB_PASSWORD
         - SANDBOX_ID: ${SandboxID}
-
 debugging:
   availability: on
