@@ -35,7 +35,7 @@ applications:
       #depends_on:
       #  - promotions-manager-api
     
- - promotions-manager-api:      
+- promotions-manager-api:      
       depends_on: 
         - promotions-manager-docdb
       input_values:
@@ -54,4 +54,3 @@ services:
 
 debugging:
   availability: on
-              
