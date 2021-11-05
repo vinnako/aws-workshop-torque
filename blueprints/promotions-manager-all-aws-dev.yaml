@@ -10,14 +10,20 @@ clouds:
 artifacts:
   - promotions-manager-ui: artifacts/latest/promotions-manager-ui.master.tar.gz
   - promotions-manager-api: artifacts/latest/promotions-manager-api.master.tar.gz
-  - mongodb: artifacts/test-data/test-data-db.tar
+  
 
 inputs:
 - PORT: 3000
 - API_PORT: 3001
-- AWS_INSTANCE_TYPE: m5.large
+- AWS_INSTANCE_TYPE: t3.large
 - RELEASE_NUMBER: none
 - API_BUILD_NUMBER: none
+- DB_USERNAME: adminuser
+- DB_PASSWORD: 
+    display_style: masked
+    description: please set the master database password
+    default_value: Welcome1234567+
+
 
 applications:
   - promotions-manager-ui:
@@ -31,17 +37,21 @@ applications:
       #  - promotions-manager-api
     
   - promotions-manager-api:      
-      target: vm1
+      depends_on: 
+        - promotions-manager-docdb
       input_values:
         - API_PORT: $API_PORT
         - AWS_INSTANCE_TYPE: $AWS_INSTANCE_TYPE
-        - DATABASE_HOST: mongodb
+        - DATABASE_HOST: $outputs.promotions-manager-docdb.connection_string
         - RELEASE_NUMBER: $RELEASE_NUMBER
         - API_BUILD_NUMBER: $API_BUILD_NUMBER
-
-        
-  - mongodb:
-      target: vm1
+  
+services:
+  - promotions-manager-docdb:
       input_values:
-        - AWS_INSTANCE_TYPE: $AWS_INSTANCE_TYPE
-              
+        - USERNAME: $DB_USERNAME
+        - PASSWORD: $DB_PASSWORD
+        - SANDBOX_ID: ${SandboxID}
+
+debugging:
+  availability: on
